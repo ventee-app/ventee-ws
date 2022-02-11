@@ -10,6 +10,9 @@ import (
 	"ventee-backend/configuration"
 )
 
+// store connections
+var connections = []*ConnectionStruct{}
+
 // Upgrade connection & disable origin check
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -34,6 +37,19 @@ func Handle(writer http.ResponseWriter, request *http.Request) {
 		Event: configuration.EVENTS.RegisterConnection,
 	})
 
+	// Store connection
+	connectionStruct := new(ConnectionStruct)
+	connectionStruct.Connection = connection
+	connectionStruct.ConnectionId = connectionId
+	connections = append(connections, connectionStruct)
+
+	log.Println("size", len(connections))
+
+	if len(connections) > 1 {
+		connections[1].Connection.WriteJSON(MessageStruct{
+			Event: "",
+		})
+	}
 	// TODO: there should be different handlers depending on the event type
 	for {
 		messageType, message, _ := connection.ReadMessage()
