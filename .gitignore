@@ -1,0 +1,11 @@
+# Directories
+tmp/
+
+# Files
+.env
+run.sh
+
+# Misc
+.DS_Store
+.idea/
+.vscode/
