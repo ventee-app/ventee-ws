@@ -8,4 +8,7 @@ type EnvironmentsStruct struct {
 
 type EventsStruct struct {
 	RegisterConnection string
+	RequestContacts    string
+	TransferComplete   string
+	TransferContacts   string
 }

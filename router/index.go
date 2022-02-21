@@ -1,4 +1,4 @@
-package handler
+package router
 
 import (
 	"log"
@@ -20,10 +20,10 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin:     func(request *http.Request) bool { return true },
 }
 
-func Handle(writer http.ResponseWriter, request *http.Request) {
+func HandleConnection(writer http.ResponseWriter, request *http.Request) {
 	connection, connectionError := upgrader.Upgrade(writer, request, nil)
 	if connectionError != nil {
-		log.Fatal(connectionError) // TODO: this should not be fatal
+		return
 	}
 
 	defer connection.Close()
@@ -43,14 +43,8 @@ func Handle(writer http.ResponseWriter, request *http.Request) {
 	connectionStruct.ConnectionId = connectionId
 	connections = append(connections, connectionStruct)
 
-	log.Println("size", len(connections))
+	log.Println("connections size", len(connections))
 
-	if len(connections) > 1 {
-		connections[1].Connection.WriteJSON(MessageStruct{
-			Event: "",
-		})
-	}
-	// TODO: there should be different handlers depending on the event type
 	for {
 		messageType, message, _ := connection.ReadMessage()
 		log.Println("recv:", string(message[:]), messageType, connectionId)
