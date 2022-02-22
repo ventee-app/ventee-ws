@@ -1,6 +1,8 @@
 package configuration
 
-const DEFAULT_PORT = "9099"
+const BACKEND_ID string = "backend"
+
+const DEFAULT_PORT string = "9099"
 
 var ENVIRONMENTS = EnvironmentsStruct{
 	Development: "development",
@@ -8,7 +10,12 @@ var ENVIRONMENTS = EnvironmentsStruct{
 	Prodduction: "prouction",
 }
 
+var ERRORS = ErrorsStruct{
+	InvalidIncomingMessage: "INVALID_INCOMING_MESSAGE",
+}
+
 var EVENTS = EventsStruct{
+	Error:              "error",               // Backend -> Client
 	RegisterConnection: "register-connection", // Backend -> Client
 	RequestContacts:    "request-contacts",    // Client (receiver) -> Backend -> Client (sender)
 	TransferComplete:   "transfer-complete",   // Client (receiver) -> Backend -> Client (sender)

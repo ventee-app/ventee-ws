@@ -6,7 +6,12 @@ type EnvironmentsStruct struct {
 	Prodduction string
 }
 
+type ErrorsStruct struct {
+	InvalidIncomingMessage string
+}
+
 type EventsStruct struct {
+	Error              string
 	RegisterConnection string
 	RequestContacts    string
 	TransferComplete   string

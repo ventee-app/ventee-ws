@@ -1,6 +1,7 @@
 package router
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -8,10 +9,11 @@ import (
 	"github.com/lucsky/cuid"
 
 	"ventee-backend/configuration"
+	"ventee-backend/types"
 )
 
 // store connections
-var connections = []*ConnectionStruct{}
+var connections = []*types.ConnectionStruct{}
 
 // Upgrade connection & disable origin check
 var upgrader = websocket.Upgrader{
@@ -30,15 +32,18 @@ func HandleConnection(writer http.ResponseWriter, request *http.Request) {
 
 	// Create a new ID for connection & send it to the client
 	connectionId := cuid.New()
-	connection.WriteJSON(MessageStruct{
-		Data: RegisterConnectionDataStruct{
-			ConnectionId: connectionId,
-		},
-		Event: configuration.EVENTS.RegisterConnection,
+	registerConnectionData, _ := json.Marshal(types.RegisterConnectionDataStruct{
+		ConnectionId: connectionId,
+	})
+	connection.WriteJSON(types.MessageStruct{
+		Data:   string(registerConnectionData[:]),
+		Event:  configuration.EVENTS.RegisterConnection,
+		Issuer: configuration.BACKEND_ID,
+		Target: connectionId,
 	})
 
 	// Store connection
-	connectionStruct := new(ConnectionStruct)
+	connectionStruct := new(types.ConnectionStruct)
 	connectionStruct.Connection = connection
 	connectionStruct.ConnectionId = connectionId
 	connections = append(connections, connectionStruct)
@@ -46,13 +51,23 @@ func HandleConnection(writer http.ResponseWriter, request *http.Request) {
 	log.Println("connections size", len(connections))
 
 	for {
-		messageType, message, _ := connection.ReadMessage()
-		log.Println("recv:", string(message[:]), messageType, connectionId)
+		var parsedMessage types.MessageStruct
+		parsingError := connection.ReadJSON(&parsedMessage)
+		if parsingError != nil {
+			errorMessageData, _ := json.Marshal(types.InvalidIncomingMessageStruct{
+				Message: configuration.ERRORS.InvalidIncomingMessage,
+			})
+			connection.WriteJSON(types.MessageStruct{
+				Data:   string(errorMessageData[:]),
+				Event:  configuration.EVENTS.Error,
+				Issuer: configuration.BACKEND_ID,
+				Target: connectionId,
+			})
+		}
 
-		writeError := connection.WriteMessage(messageType, message)
-		if writeError != nil {
-			log.Println("write:", writeError)
-			break
+		if parsedMessage.Event == configuration.EVENTS.TransferContacts {
+			log.Println(parsedMessage.Data)
+			// handlers.TransferContacts(connection, connectionId, connections, parsedMessage)
 		}
 	}
 }
