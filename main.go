@@ -10,7 +10,7 @@ import (
 	"github.com/joho/godotenv"
 
 	"ventee-backend/configuration"
-	"ventee-backend/router"
+	"ventee-backend/handler"
 )
 
 func main() {
@@ -27,7 +27,7 @@ func main() {
 		PORT = configuration.DEFAULT_PORT
 	}
 
-	http.HandleFunc("/", router.HandleConnection)
+	http.HandleFunc("/", handler.HandleConnection)
 
 	log.Println("VENTEE-BACKEND is running on port", PORT)
 	launchError := http.ListenAndServe(
