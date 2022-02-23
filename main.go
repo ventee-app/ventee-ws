@@ -9,8 +9,8 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"ventee-backend/configuration"
-	"ventee-backend/handler"
+	"ventee-ws/configuration"
+	"ventee-ws/handler"
 )
 
 func main() {

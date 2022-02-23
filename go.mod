@@ -1,4 +1,4 @@
-module ventee-backend
+module ventee-ws
 
 go 1.18
 

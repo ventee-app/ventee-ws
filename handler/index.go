@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/lucsky/cuid"
 
-	"ventee-backend/configuration"
+	"ventee-ws/configuration"
 )
 
 var connections []*ConnectionStruct
