@@ -2,7 +2,9 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/websocket"
 	"github.com/lucsky/cuid"
@@ -13,9 +15,9 @@ import (
 var connections []*ConnectionStruct
 
 var upgrader = websocket.Upgrader{
+	CheckOrigin:     func(request *http.Request) bool { return true },
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-	CheckOrigin:     func(request *http.Request) bool { return true },
 }
 
 func HandleConnection(writer http.ResponseWriter, request *http.Request) {
@@ -42,6 +44,11 @@ func HandleConnection(writer http.ResponseWriter, request *http.Request) {
 	connectionStruct.ConnectionId = connectionId
 	connections = append(connections, connectionStruct)
 
+	env := os.Getenv("ENV")
+	if env == configuration.ENVIRONMENTS.Development {
+		log.Println("Connected", connectionId)
+	}
+
 	for {
 		var parsedMessage MessageStruct
 		parsingError := connection.ReadJSON(&parsedMessage)
@@ -54,6 +61,11 @@ func HandleConnection(writer http.ResponseWriter, request *http.Request) {
 			}
 			connections[index] = connections[len(connections)-1]
 			connections = connections[:len(connections)-1]
+
+			if env == configuration.ENVIRONMENTS.Development {
+				log.Println("Disconnected", connectionId)
+			}
+
 			break
 		}
 
