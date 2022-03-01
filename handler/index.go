@@ -46,7 +46,7 @@ func HandleConnection(writer http.ResponseWriter, request *http.Request) {
 
 	env := os.Getenv("ENV")
 	if env == configuration.ENVIRONMENTS.Development {
-		log.Println("Connected", connectionId)
+		log.Println("Connected", connectionId, "| Total:", len(connections))
 	}
 
 	for {
@@ -63,7 +63,7 @@ func HandleConnection(writer http.ResponseWriter, request *http.Request) {
 			connections = connections[:len(connections)-1]
 
 			if env == configuration.ENVIRONMENTS.Development {
-				log.Println("Disconnected", connectionId)
+				log.Println("Disconnected", connectionId, "| Total:", len(connections))
 			}
 
 			break
@@ -76,6 +76,9 @@ func HandleConnection(writer http.ResponseWriter, request *http.Request) {
 					target = connections[i]
 				}
 			}
+
+			// TODO: handle a case when target was not found
+
 			target.Connection.WriteJSON(MessageStruct{
 				Event:  configuration.EVENTS.RequestContacts,
 				Issuer: connectionId,
@@ -90,6 +93,9 @@ func HandleConnection(writer http.ResponseWriter, request *http.Request) {
 					target = connections[i]
 				}
 			}
+
+			// TODO: handle a case when target was not found
+
 			target.Connection.WriteJSON(MessageStruct{
 				Data:   parsedMessage.Data,
 				Event:  configuration.EVENTS.TransferContacts,
@@ -105,6 +111,9 @@ func HandleConnection(writer http.ResponseWriter, request *http.Request) {
 					target = connections[i]
 				}
 			}
+
+			// TODO: handle a case when target was not found
+
 			target.Connection.WriteJSON(MessageStruct{
 				Event:  configuration.EVENTS.TransferComplete,
 				Issuer: connectionId,
