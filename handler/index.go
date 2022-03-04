@@ -53,72 +53,73 @@ func HandleConnection(writer http.ResponseWriter, request *http.Request) {
 		var parsedMessage MessageStruct
 		parsingError := connection.ReadJSON(&parsedMessage)
 		if parsingError != nil {
-			var index int
+			var index int = -1
 			for i := range connections {
-				if connections[i].ConnectionId == parsedMessage.Target {
+				if connections[i].ConnectionId == connectionId {
 					index = i
 				}
 			}
-			connections[index] = connections[len(connections)-1]
-			connections = connections[:len(connections)-1]
-
-			if env == configuration.ENVIRONMENTS.Development {
-				log.Println("Disconnected", connectionId, "| Total:", len(connections))
+			if index >= 0 {
+				connections[index] = connections[len(connections)-1]
+				connections = connections[:len(connections)-1]
+				if env == configuration.ENVIRONMENTS.Development {
+					log.Println("Disconnected", connectionId, "| Total:", len(connections))
+				}
 			}
-
 			break
 		}
 
-		if parsedMessage.Event == configuration.EVENTS.RequestContacts {
+		if parsedMessage.Event == configuration.EVENTS.RequestContacts &&
+			parsedMessage.Issuer != "" && parsedMessage.Target != "" {
 			var target *ConnectionStruct
 			for i := range connections {
 				if connections[i].ConnectionId == parsedMessage.Target {
 					target = connections[i]
 				}
 			}
-
-			// TODO: handle a case when target was not found
-
-			target.Connection.WriteJSON(MessageStruct{
-				Event:  configuration.EVENTS.RequestContacts,
-				Issuer: connectionId,
-				Target: target.ConnectionId,
-			})
+			if target != nil {
+				target.Connection.WriteJSON(MessageStruct{
+					Event:  configuration.EVENTS.RequestContacts,
+					Issuer: connectionId,
+					Target: target.ConnectionId,
+				})
+			}
 		}
 
-		if parsedMessage.Event == configuration.EVENTS.TransferContacts {
+		if parsedMessage.Event == configuration.EVENTS.TransferContacts &&
+			parsedMessage.Issuer != "" && parsedMessage.Target != "" &&
+			parsedMessage.Data != "" {
 			var target *ConnectionStruct
 			for i := range connections {
 				if connections[i].ConnectionId == parsedMessage.Target {
 					target = connections[i]
 				}
 			}
-
-			// TODO: handle a case when target was not found
-
-			target.Connection.WriteJSON(MessageStruct{
-				Data:   parsedMessage.Data,
-				Event:  configuration.EVENTS.TransferContacts,
-				Issuer: connectionId,
-				Target: target.ConnectionId,
-			})
+			if target != nil {
+				target.Connection.WriteJSON(MessageStruct{
+					Data:   parsedMessage.Data,
+					Event:  configuration.EVENTS.TransferContacts,
+					Issuer: connectionId,
+					Target: target.ConnectionId,
+				})
+			}
 		}
 
-		if parsedMessage.Event == configuration.EVENTS.TransferComplete {
+		if parsedMessage.Event == configuration.EVENTS.TransferComplete &&
+			parsedMessage.Issuer != "" && parsedMessage.Target != "" {
 			var target *ConnectionStruct
 			for i := range connections {
 				if connections[i].ConnectionId == parsedMessage.Target {
 					target = connections[i]
 				}
 			}
-
-			// TODO: handle a case when target was not found
-
-			target.Connection.WriteJSON(MessageStruct{
-				Event:  configuration.EVENTS.TransferComplete,
-				Issuer: connectionId,
-				Target: target.ConnectionId,
-			})
+			if target != nil {
+				target.Connection.WriteJSON(MessageStruct{
+					Event:  configuration.EVENTS.TransferComplete,
+					Issuer: connectionId,
+					Target: target.ConnectionId,
+				})
+			}
 		}
 	}
 }
