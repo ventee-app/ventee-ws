@@ -1,6 +1,6 @@
 ## Ventee Websockets server
 
-A Websockets server for [Ventee](https://github.com/ventee-app/ventee-mobile) mobile application
+A simple Websockets server for [Ventee](https://github.com/ventee-app/ventee-mobile) mobile application
 
 Stack: [Golang](https://go.dev), [Gorilla Websocket](https://github.com/gorilla/websocket)
 
@@ -17,7 +17,7 @@ go get
 
 ### Environment variables
 
-The `.env` file is required (if **not** running on [Heroku](https://www.heroku.com)), see [.env.example](./.env.example) for details
+The `.env` file is required (**not** required for [Heroku](https://www.heroku.com)), see [.env.example](./.env.example) for details
 
 ### Launch
 
