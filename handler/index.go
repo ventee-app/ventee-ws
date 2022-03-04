@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/websocket"
 	"github.com/lucsky/cuid"
@@ -44,10 +43,7 @@ func HandleConnection(writer http.ResponseWriter, request *http.Request) {
 	connectionStruct.ConnectionId = connectionId
 	connections = append(connections, connectionStruct)
 
-	env := os.Getenv("ENV")
-	if env == configuration.ENVIRONMENTS.Development {
-		log.Println("Connected", connectionId, "| Total:", len(connections))
-	}
+	log.Println("Connected", connectionId, "| Total:", len(connections))
 
 	for {
 		var parsedMessage MessageStruct
@@ -62,9 +58,7 @@ func HandleConnection(writer http.ResponseWriter, request *http.Request) {
 			if index >= 0 {
 				connections[index] = connections[len(connections)-1]
 				connections = connections[:len(connections)-1]
-				if env == configuration.ENVIRONMENTS.Development {
-					log.Println("Disconnected", connectionId, "| Total:", len(connections))
-				}
+				log.Println("Disconnected", connectionId, "| Total:", len(connections))
 			}
 			break
 		}

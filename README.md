@@ -6,12 +6,14 @@ Stack: [Golang](https://go.dev), [Gorilla Websocket](https://github.com/gorilla/
 
 DEV: http://localhost:9099
 
+HEROKU: https://ventee-ws.herokuapp.com
+
 ### Deploy
 
 ```shell script
 git clone https://github.com/ventee-app/ventee-ws
 cd ./ventee-ws
-gvm use 1.18
+gvm use 1.16
 go get
 ```
 
@@ -26,6 +28,10 @@ go run ./main.go
 ```
 
 [AIR](https://github.com/cosmtrek/air) can be used as well
+
+### Heroku
+
+The `release` branch is auto-deployed to [Heroku](https://www.heroku.com)
 
 ### License
 
